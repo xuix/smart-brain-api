@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  #Postgres
+  postgres:
+    container_name: postgres
+    #image: postgres
+    build: ./postgres
+    environment:
+      POSTGRES_USER: sally
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: smart-brain-docker
+      POSTGRES_HOST: postgres
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    ports:
+      - "5555:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+
+    #Backend API
+  smart-brain-api:
+    container_name: backend
+    # image node:14.15.3  - not needed as using build
+    # to run the dockerfile which has node
+    build: ./
+    command: npm start
+    working_dir: /usr/src/smart-brain-api
+    environment:
+      #POSTGRESS_URI: postgres://sally:secret@postgres:5432/smart-brain-docker
+      POSTGRES_USER: sally
+      POSTGRES_PASSWORD: secret
+      POSTGRES_URL: postgres://sally:secret@localhost:5432/smart-brain
+      POSTGRES_DB: smart-brain-docker
+      POSTGRES_HOST: "postgres"
+    #  links: -deprecated
+    #    - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/smart-brain-api
