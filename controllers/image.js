@@ -6,7 +6,7 @@ const app = new Clarifai.App({
 
 const handleImage = (req, res, db) => {
   const { id } = req.body;
-  console.log(id);
+  console.log("##in handleimage id =", id);
   db("users")
     .increment("entries", 1)
     .where({ id })

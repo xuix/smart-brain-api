@@ -21,7 +21,9 @@ CREATE TABLE public.users
     name character varying(50) COLLATE pg_catalog."default" NOT NULL,
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     joined timestamp with time zone NOT NULL,
-    entries bigint NOT NULL DEFAULT 0
+    entries bigint NOT NULL DEFAULT 0,
+    pet character varying(50) ,
+    age int DEFAULT 0
 )
 
 TABLESPACE pg_default;

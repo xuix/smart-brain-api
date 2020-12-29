@@ -1,6 +1,12 @@
 version: "3.9"
 
 services:
+  # Add redis
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
   #Postgres
   postgres:
     container_name: postgres
@@ -40,6 +46,8 @@ services:
       POSTGRES_URL: postgres://sally:secret@localhost:5432/smart-brain
       POSTGRES_DB: smart-brain-docker
       POSTGRES_HOST: "postgres"
+      REDIS_URL: redis://redis:6379/
+
     #  links: -deprecated
     #    - postgres
     ports:

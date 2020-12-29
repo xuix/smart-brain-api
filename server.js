@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const knex = require("knex");
 const bcrypt = require("bcrypt");
@@ -8,6 +9,7 @@ const register = require("./controllers/register");
 const signin = require("./controllers/signin");
 const profile = require("./controllers/profile");
 const image = require("./controllers/image");
+const auth = require("./controllers/authorization");
 
 const db = knex({
   client: "pg",
@@ -29,7 +31,7 @@ const db = knex({
 });
 
 const app = express();
-console.log("#########");
+app.use(bodyParser.json());
 app.use(morgan("combined"));
 app.use(cors());
 app.use(express.json());
@@ -38,17 +40,22 @@ app.get("/", (req, res) => {
   res.send("I hear you now xxxxyyyy");
 });
 
-app.get("/profile/:id", (req, res) => {
+app.get("/profile/:id", auth.requireAuth, (req, res) => {
   profile.handleProfile(req, res, db, bcrypt);
 });
+app.post("/profile/:id", auth.requireAuth, (req, res) => {
+  console.log("req.body", req.body);
+  profile.handleProfileUpdate(req, res, db);
+});
 
-app.put("/image", (req, res) => {
+app.put("/image", auth.requireAuth, (req, res) => {
   image.handleImage(req, res, db, bcrypt);
 });
 
-app.post("/signin", (req, res) => {
-  signin.handleSignin(req, res, db, bcrypt);
-});
+app.post("/signin", signin.signinAuthentication(db, bcrypt));
+//console.log("##about to signinauthenticate");
+//res.send("I hear you now xxxxyyyy");
+// profile.handleProfile(req, res, db, bcrypt);
 
 app.post("/register", (req, res) => {
   register.handleRegister(req, res, db, bcrypt);
@@ -61,7 +68,7 @@ app.post("/register", (req, res) => {
   );
 });
 
-app.post("/imageApiCall", (req, res) => {
+app.post("/imageApiCall", auth.requireAuth, (req, res) => {
   image.handleImageApiCall(req, res);
 });
 
